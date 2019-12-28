@@ -17,7 +17,9 @@
 const utils       = require('@iobroker/adapter-core'); // Get common adapter utils
 const adapterName = require('./package.json').name.split('.').pop();
 const Server      = require('./lib/server');
+const Client      = require('./lib/client');
 let   server      = null;
+let   client      = null;
 let   adapter;
 
 function decrypt(key, value) {
@@ -53,6 +55,9 @@ function startAdapter(options) {
         if (server) {
             server.destroy(cb);
             server = null;
+        } else if (client) {
+            client.destroy(cb);
+            client = null
         } else if (typeof cb === 'function') {
             cb();
         }
@@ -62,7 +67,7 @@ function startAdapter(options) {
     adapter.on('stateChange', (id, state) => {
         adapter.log.debug('stateChange ' + id + ': ' + JSON.stringify(state));
         // you can use the ack flag to detect if state is desired or acknowledged
-        state && !state.ack && server && server.onStateChange(id, state);
+        state && !state.ack && (server && server.onStateChange(id, state)) || (client && client.onStateChange(id, state));
     });
     return adapter;
 }
@@ -80,7 +85,8 @@ function main() {
         states && states.length && states.forEach(state =>
                 state._id.match(/\.alive$/) && adapter.setForeignState(state._id, false, true)));
 
-    server = new Server(adapter);
+    // server = new Server(adapter);
+    client = new Client(adapter);
 }
 
 // If started as allInOne/compact mode => return function to create instance

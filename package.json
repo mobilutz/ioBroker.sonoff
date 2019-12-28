@@ -1,5 +1,5 @@
 {
-  "name": "iobroker.sonoff",
+  "name": "iobroker.sonoff-dev",
   "description": "The adapter allows to send and receive MQTT messages from ioBroker and to be a broker.",
   "version": "2.3.3",
   "author": "bluefox <dogafox@gmail.com>",
